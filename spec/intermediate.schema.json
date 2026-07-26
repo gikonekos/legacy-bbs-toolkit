@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/gikonekos/legacy-bbs-toolkit/spec/intermediate.schema.json",
+  "title": "Legacy BBS Toolkit Intermediate Representation (IR)",
+  "description": "1メッセージ（1投稿）に対応するIntermediate Representationのスキーマ。spec/parser-api.mdのDetection/Selection/Provenance契約、およびspec/principles.mdのArchive First原則に基づく。",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "post_id",
+    "raw_timestamp",
+    "author_raw",
+    "title_raw",
+    "body_raw",
+    "parser_namespace",
+    "provenance"
+  ],
+  "properties": {
+    "post_id": {
+      "type": "string",
+      "description": "投稿の一意識別子。元アーカイブ内での表現（連番等）をそのまま文字列として保持する。改変禁止。"
+    },
+    "raw_timestamp": {
+      "type": "string",
+      "description": "タイムスタンプの原文文字列。改変禁止（Timestamp Handling契約1）。"
+    },
+    "parsed_timestamp": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "解釈済み日時（ISO 8601、UTCオフセット付き）。解釈できない場合はnull。タイムゾーンが原文に明示されない場合の前提値はProvenance.assumed_timezone_offsetに記録する（Timestamp Handling契約2）。"
+    },
+    "author_raw": {
+      "type": "string",
+      "description": "投稿者名の原文（トリップ・コテハン等含む）。改変禁止。ただしサニタイズ対象フィールドである（他の投稿者の個人情報を含み得るため）。"
+    },
+    "title_raw": {
+      "type": "string",
+      "description": "題名欄の原文。zantei系列では多くの場合空、または「＞」「＞ユーザー名」等の返信参照マーカーとして使われる。自由記述の題名ではなく、他の投稿者名を含み得るためauthor_rawと同様にサニタイズ対象として扱う。"
+    },
+    "body_raw": {
+      "type": "string",
+      "description": "本文の原文（サニタイズ前）。改変禁止（Archive First原則）。"
+    },
+    "body_sanitized": {
+      "type": ["string", "null"],
+      "description": "サニタイズ後本文。NG辞書判定（ng-check相当）を適用した結果。未適用の場合はnull。"
+    },
+    "author_email_detected": {
+      "type": "boolean",
+      "default": false,
+      "description": "author_raw内にmailtoリンク（メールアドレス）が検出されたかどうか。zantei系列では投稿者欄に稀にメールアドレスが埋め込まれ、CGIが自動的にmailtoリンク化する。"
+    },
+    "author_email_sanitized": {
+      "type": ["string", "null"],
+      "description": "検出された場合のみ設定。実行時刻ベースのsaltを用いたSHA-256ハッシュの先頭8文字のみを保持し、原文（実メールアドレス）は一切保持しない（完全一致による複合を避けるため8文字に切り詰める）。"
+    },
+    "host_meta_detected": {
+      "type": "boolean",
+      "default": false,
+      "description": "ホスト情報（IPアドレス・ホスト名等）がログ内に検出されたかどうか。"
+    },
+    "host_meta_sanitized": {
+      "type": ["string", "null"],
+      "description": "検出された場合のみ設定。実行時刻ベースのsaltを用いたSHA-256ハッシュの先頭8文字のみを保持し、原文（実IP等）は一切保持しない（完全一致による複合を避けるため8文字に切り詰める）。"
+    },
+    "ua_meta_detected": {
+      "type": "boolean",
+      "default": false,
+      "description": "User-Agent情報がログ内に検出されたかどうか。"
+    },
+    "ua_meta_sanitized": {
+      "type": ["string", "null"],
+      "description": "検出された場合のみ設定。実行時刻ベースのsaltを用いたSHA-256ハッシュの先頭8文字のみを保持し、原文は一切保持しない（完全一致による複合を避けるため8文字に切り詰める）。"
+    },
+    "parser_namespace": {
+      "type": "string",
+      "description": "処理したParserプラグインの名前空間（Parser Plugin Namespace契約）。例: legacy-bbs-toolkit.parser.zantei"
+    },
+    "provenance": {
+      "type": "object",
+      "description": "Provenance情報一式（Parser API Provenance契約）。",
+      "additionalProperties": false,
+      "required": ["selection_path"],
+      "properties": {
+        "selection_path": {
+          "type": "string",
+          "enum": ["selection", "user_override"],
+          "description": "選択経路：自動決定（selection）かUser Overrideによる明示的指定か。"
+        },
+        "resolution_basis": {
+          "type": ["string", "null"],
+          "description": "selection_pathがselectionの場合、Resolution Policyがどの比較基準によって確定したか。"
+        },
+        "pre_override_selection": {
+          "type": ["string", "null"],
+          "description": "selection_pathがuser_overrideの場合、Override前のSelection結果。"
+        },
+        "assumed_timezone_offset": {
+          "type": ["string", "null"],
+          "pattern": "^[+-]\\d{2}:\\d{2}$",
+          "description": "raw_timestampにタイムゾーンが明示されていない場合に使用した前提タイムゾーン（UTCオフセット形式、例: +09:00）。Timestamp Handling契約2。"
+        },
+        "host_meta_action": {
+          "type": ["string", "null"],
+          "enum": [null, "not_detected", "anonymized", "removed"],
+          "description": "host_meta_detectedがtrueの場合に、実際に取った処理（匿名化／除去）の記録。原文の値そのものはここにも記録しない。"
+        },
+        "author_email_action": {
+          "type": ["string", "null"],
+          "enum": [null, "not_detected", "anonymized", "removed"],
+          "description": "author_email_detectedがtrueの場合に、実際に取った処理（匿名化／除去）の記録。原文の値そのものはここにも記録しない。"
+        },
+        "ua_meta_action": {
+          "type": ["string", "null"],
+          "enum": [null, "not_detected", "anonymized", "removed"],
+          "description": "ua_meta_detectedがtrueの場合に、実際に取った処理（匿名化／除去）の記録。原文の値そのものはここにも記録しない。"
+        },
+        "body_pattern_hits": {
+          "type": ["integer", "null"],
+          "description": "body_raw内でhost_pattern_detectorが検出したホスト情報らしきパターンの件数。0件または未検出の場合はnullまたは省略。"
+        },
+        "author_pattern_hits": {
+          "type": ["integer", "null"],
+          "description": "author_raw内でhost_pattern_detectorが検出したホスト情報らしきパターンの件数。0件または未検出の場合はnullまたは省略。"
+        },
+        "title_pattern_hits": {
+          "type": ["integer", "null"],
+          "description": "title_raw内でhost_pattern_detectorが検出したホスト情報らしきパターンの件数。0件または未検出の場合はnullまたは省略。"
+        },
+        "body_pattern_action": {
+          "type": ["string", "null"],
+          "enum": [null, "not_detected", "anonymized", "removed"],
+          "description": "body_pattern_hitsが1以上の場合に、実際に取った処理の記録。原文の値そのものはここにも記録しない。"
+        },
+        "ng_check_ran": {
+          "type": "boolean",
+          "default": false,
+          "description": "[[ng-check]]（ng-check.php）によるNG語サニタイズが実際に実行されたかどうか。未設定・呼び出し失敗の場合はfalse。"
+        },
+        "ng_check_ng_detected": {
+          "type": ["boolean", "null"],
+          "description": "ng_check_ranがtrueの場合のみ設定。ng-check.phpがNG語を検出したかどうか（終了コード3=true、0=false）。"
+        },
+        "ng_check_match_count": {
+          "type": ["integer", "null"],
+          "description": "ng_check_ranがtrueかつNG該当ありの場合のみ設定。ng-check.phpが報告した検出件数。"
+        }
+      }
+    }
+  }
+}

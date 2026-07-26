@@ -63,8 +63,9 @@ Derived from: Archive First, Separation of Specification and Implementation
    選択経路が検証可能となる情報を記録しなければならない
 4. Provenanceは、記録内容が事後に検証可能でなければならない
 5. 保存形式・改訂方式（上書き禁止・追記のみ許可等）は、本契約の
-   範囲外とする（意図的な保留。仕様策定の途中で上書きルールを
-   固定するとコスト過多になるため、Phase 2完了後に別途検討する）
+   範囲外とする（意図的な保留。現実装ではJSON Lines形式で1行1IRとして
+   出力しており、上書き禁止・追記のみといった制約は実装側の運用方針に
+   委ねる）
 
 ## Parser Plugin Namespace
 
@@ -88,10 +89,7 @@ Derived from: Archive First, Separation of Specification and Implementation
    実施要項に委ねる
 
 実施要項（任意・非拘束）:
-- 推奨既定値: Asia/Tokyo
-
-※ 本節のファイル配置（parser-api.md内に置くか、別ファイルに分離するか）
-は編集上の保留（未確定）。
+- 推奨既定値: Asia/Tokyo（+09:00）
 
 ## Non-Guarantees
 

@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "legacy-bbs-toolkit"
+version = "0.1.0"
+description = "日本語BBS過去ログのアーカイブ前処理基盤（実装） / Preprocessing foundation for legacy Japanese BBS archives (1999-2002 era)"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+
+[project.scripts]
+legacy-bbs-toolkit = "legacy_bbs_toolkit.cli:main"
+
+# Parser Plugin Namespace契約に基づくentry_points登録。
+# グループ名は legacy_bbs_toolkit.parsers で固定。
+# ここでの "zantei" はentry_point名（Pythonパッケージング上の識別子）で
+# あり、Parser自身が持つ名前空間文字列（ZanteiParser.namespace =
+# "legacy-bbs-toolkit.parser.zantei"）とは別物である点に注意。
+[project.entry-points."legacy_bbs_toolkit.parsers"]
+zantei = "legacy_bbs_toolkit.parsers.zantei:ZanteiParser"
+
+[tool.setuptools.packages.find]
+where = ["src"]
