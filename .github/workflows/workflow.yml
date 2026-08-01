@@ -30,9 +30,6 @@ jobs:
   publish:
     needs: build
     runs-on: ubuntu-latest
-    environment:
-      name: pypi
-      url: https://pypi.org/p/legacy-bbs-toolkit
     permissions:
       id-token: write  # Trusted Publishing (OIDC) に必須
     steps:
