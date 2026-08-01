@@ -1,7 +1,7 @@
 """
-legacy-bbs-toolkit: zantei20070218 Parser
+legacy-bbs-toolkit: kscrr1p9 (旧称zantei20070218) Parser
 
-Namespace: legacy-bbs-toolkit.parser.zantei
+Namespace: legacy-bbs-toolkit.parser.kscrr1p9
 Derived from: spec/parser-api.md (Detection / Provenance / Timestamp Handling /
 Parser Plugin Namespace), spec/principles.md (Archive First)
 
@@ -20,7 +20,7 @@ from typing import Optional
 from legacy_bbs_toolkit import host_pattern_detector, ng_check_bridge
 
 
-PARSER_NAMESPACE = "legacy-bbs-toolkit.parser.zantei"
+PARSER_NAMESPACE = "legacy-bbs-toolkit.parser.kscrr1p9"
 
 # メッセージブロックの開始・終了マーカー
 # zbbs.cgi の $tmpl_msg テンプレートより:
@@ -46,8 +46,13 @@ _TITLE_RE = re.compile(r"<FONT[^>]*>\s*<B>(.*?)</B>\s*</FONT>", re.DOTALL)
 _AUTHOR_RE = re.compile(r"投稿者[：:]\s*<B>(.*?)</B>", re.DOTALL)
 # 本文抽出は貪欲マッチとする。テンプレート構造上、ブロック内の最後の
 # </PRE>が本文の正しい終端であり、投稿者が本文中に文字通り「</PRE>」と
-# 書き込んでいた場合（実データで文字通りの「<PRE>」の書き込みを1件確認、
-# post_id 8280）でも本文が途中で切れないようにするため。
+# 書き込んでいた場合（実データで確認済み、post_id 8280）でも本文が
+# 途中で切れないようにするため。
+#
+# 実データ検証（内容非閲覧、タグの形と出現数のみ確認）により、生の
+# <PRE>/</PRE>混入は実在するリスクであることを確認済み。原因は
+# zantei固有のレガシー機能（現在は特に懸念不要、対応済み事項として
+# 貪欲マッチを維持）。
 _BODY_RE = re.compile(r"<PRE[^>]*>(.*)</PRE>", re.DOTALL)
 # 投稿者名が<A>タグでラップされている場合(mailtoまたはURL)に、
 # 表示名部分だけを取り出すための補助パターン
@@ -116,7 +121,7 @@ class ParseResult:
         return len(self.records)
 
 
-class ZanteiParser:
+class Kscrr1p9Parser:
     """zantei20070218形式（あやしいわーるど＠暫定系列）向けParser。"""
 
     namespace = PARSER_NAMESPACE

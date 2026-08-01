@@ -14,11 +14,17 @@ legacy-bbs-toolkit = "legacy_bbs_toolkit.cli:main"
 
 # Parser Plugin Namespace契約に基づくentry_points登録。
 # グループ名は legacy_bbs_toolkit.parsers で固定。
-# ここでの "zantei" はentry_point名（Pythonパッケージング上の識別子）で
-# あり、Parser自身が持つ名前空間文字列（ZanteiParser.namespace =
-# "legacy-bbs-toolkit.parser.zantei"）とは別物である点に注意。
+# ここでの "kscrr1p9" はentry_point名（Pythonパッケージング上の識別子）で
+# あり、Parser自身が持つ名前空間文字列（Kscrr1p9Parser.namespace =
+# "legacy-bbs-toolkit.parser.kscrr1p9"）とは別物である点に注意。
+# （旧名 "zantei"。対象スクリプト自体はzantei20070218のまま変更なし。）
 [project.entry-points."legacy_bbs_toolkit.parsers"]
-zantei = "legacy_bbs_toolkit.parsers.zantei:ZanteiParser"
+kscrr1p9 = "legacy_bbs_toolkit.parsers.kscrr1p9:Kscrr1p9Parser"
+ksphp_plus = "legacy_bbs_toolkit.parsers.ksphp_plus:KsphpPlusParser"
+remix = "legacy_bbs_toolkit.parsers.hr_boundary:RemixParser"
+mizuiro = "legacy_bbs_toolkit.parsers.hr_boundary:MizuiroParser"
+meiso = "legacy_bbs_toolkit.parsers.hr_boundary:MeisoParser"
+ariake = "legacy_bbs_toolkit.parsers.hr_boundary:AriakeParser"
 
 [tool.setuptools.packages.find]
 where = ["src"]

@@ -199,7 +199,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     parser = registry.get(namespace)
-    # Parser個別の設定（salt/ng-check）はzantei Parserのコンストラクタ
+    # Parser個別の設定（salt/ng-check）はkscrr1p9 Parserのコンストラクタ
     # 引数として渡し直す。TODO: Parser共通の設定受け渡し方法は、仕様側
     # （Selectable Specification）とあわせて将来整理する。
     parser = type(parser)(
