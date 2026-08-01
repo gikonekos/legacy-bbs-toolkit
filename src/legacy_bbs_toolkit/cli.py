@@ -125,6 +125,37 @@ def _read_file(path: Path, encoding_hint: str | None) -> str:
     return raw.decode(enc, errors="replace")
 
 
+# namespace -> 非エンジニア向けの日本語表示名・簡単な説明
+# CLIサマリー表示専用。パーサー自体の識別・動作には一切影響しない。
+_FRIENDLY_PARSER_NAMES: dict[str, str] = {
+    "legacy-bbs-toolkit.parser.kscrr1p9": (
+        "kscrr1p9系（あやしいわーるど＠暫定・zbbs.cgi系列）"
+    ),
+    "legacy-bbs-toolkit.parser.ksphp_plus": (
+        "ksphp_plus系（kuzuha-scriptPHP+系列）"
+    ),
+    "legacy-bbs-toolkit.parser.remix": "remix系（リミックス系統）",
+    "legacy-bbs-toolkit.parser.mizuiro": "mizuiro系（みずいろ／ダーザイン系統）",
+    "legacy-bbs-toolkit.parser.meiso": "meiso系（メイソ系統）",
+    "legacy-bbs-toolkit.parser.ariake": (
+        "ariake系（有明／MINIBBS系統・投稿日時に年情報なし）"
+    ),
+}
+
+_FRIENDLY_SELECTION_PATH: dict[str, str] = {
+    "user_override": "手動指定（--override）",
+    "selection": "自動判定",
+}
+
+
+def _friendly_parser_name(namespace: str) -> str:
+    return _FRIENDLY_PARSER_NAMES.get(namespace, namespace)
+
+
+def _friendly_selection_path(path: str | None) -> str:
+    return _FRIENDLY_SELECTION_PATH.get(path or "", path or "不明")
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         prog="legacy-bbs-toolkit",
@@ -160,6 +191,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "--summary-only",
         action="store_true",
         help="ファイル出力せず、サマリ（件数・警告）のみ表示",
+    )
+    ap.add_argument(
+        "--verbose",
+        action="store_true",
+        help="技術的な詳細（namespace文字列・selection内部情報等）も表示する",
     )
     return ap
 
@@ -210,31 +246,66 @@ def main(argv: list[str] | None = None) -> int:
 
     result = parser.parse(text)
 
-    print(f"parser        : {namespace}")
-    print(f"selection     : {selection_provenance.get('selection_path')}")
-    print(f"records       : {len(result.records)}")
-    print(f"warnings      : {len(result.warnings)}")
-    for w in result.warnings:
-        print(f"  - {w}")
-
     n_email = sum(1 for r in result.records if r.author_email_detected)
     n_body_hits = sum(
         r.provenance.get("body_pattern_hits", 0) for r in result.records
     )
     n_ng = sum(1 for r in result.records if r.provenance.get("ng_check_ran"))
-    print(f"author_email_detected : {n_email}")
-    print(f"body_pattern_hits sum : {n_body_hits}")
-    print(f"ng_check_ran          : {n_ng}")
+    n_year_missing = sum(
+        1 for r in result.records
+        if r.provenance.get("timestamp_year_missing")
+    )
+
+    out_path = Path(args.out) if args.out else in_path.with_suffix(".ir.jsonl")
+
+    # ---- 非エンジニア向けサマリー（既定表示） ----
+    print("=" * 40)
+    print(" legacy-bbs-toolkit 解析結果")
+    print("=" * 40)
+    print()
+    if result.warnings:
+        print("⚠️  警告があります。内容を確認してください。")
+    else:
+        print("✅ 正常に処理できました。")
+    print()
+    print(f"  使用したパーサー : {_friendly_parser_name(namespace)}")
+    print(f"  判定方法         : {_friendly_selection_path(selection_provenance.get('selection_path'))}")
+    print(f"  投稿件数         : {len(result.records)}件")
+    print(f"  警告             : {'なし' if not result.warnings else f'{len(result.warnings)}件'}")
+    for w in result.warnings:
+        print(f"    - {w}")
+    if n_email:
+        print(f"  メールアドレスらしき記述: {n_email}件（自動的に匿名化されます）")
+    if n_year_missing:
+        print(f"  投稿日時に年情報がない投稿: {n_year_missing}件（年は補完せず空欄のまま出力）")
+    if not args.summary_only:
+        print(f"  出力先           : {out_path}")
+    print()
+
+    # ---- 技術的な詳細（--verbose指定時のみ） ----
+    if args.verbose:
+        print("-" * 40)
+        print(" 技術的な詳細（--verbose）")
+        print("-" * 40)
+        print(f"parser        : {namespace}")
+        print(f"selection     : {selection_provenance.get('selection_path')}")
+        print(f"records       : {len(result.records)}")
+        print(f"warnings      : {len(result.warnings)}")
+        for w in result.warnings:
+            print(f"  - {w}")
+        print(f"author_email_detected : {n_email}")
+        print(f"body_pattern_hits sum : {n_body_hits}")
+        print(f"ng_check_ran          : {n_ng}")
+        print(f"timestamp_year_missing: {n_year_missing}")
+        print()
 
     if args.summary_only:
         return 0
 
-    out_path = Path(args.out) if args.out else in_path.with_suffix(".ir.jsonl")
     with out_path.open("w", encoding="utf-8") as f:
         for record in result.records:
             f.write(json.dumps(record.to_dict(), ensure_ascii=False))
             f.write("\n")
-    print(f"output        : {out_path}")
     return 0
 
 

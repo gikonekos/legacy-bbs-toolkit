@@ -14,6 +14,8 @@
 
 詳細は [spec/principles.md](spec/principles.md) を参照。
 
+はじめて使う方は [QUICKSTART.md](QUICKSTART.md)（インストール〜基本的な使い方）をどうぞ。
+
 ## 仕様
 
 - [spec/principles.md](spec/principles.md) — 設計原則
