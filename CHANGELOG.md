@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## 2026-08-02（2回目）
+
+### 追加
+- PyPI公開に向けたメタデータを `pyproject.toml` に追加
+  （`readme`、`authors`（MOTOI Kenkichi）、`keywords`、`classifiers`、
+  `[project.urls]`（Homepage/Repository/Changelog））。
+- GitHub Actions ワークフロー `.github/workflows/workflow.yml` を追加。
+  PyPI Trusted Publishing（OIDC）によるリリース公開時の自動パッケージ公開に対応。
+- 「くずはすくりぷとm (2008/01/17)」系統（サイト「あやしくないわーるど＠ふぁっしょん」、
+  post_id 161-570・410件）の実データ検証を実施。マーカー・本文タグ・日付書式が
+  既存 `kscrr1p9` パーサーと一致し、日付前の固定ラベル「投稿日：」も抽出に影響なし。
+  警告0・欠落なしで全件パース成功のため、新規Parser追加は不要と判断。
+
 ## 2026-08-02
 
 ### 変更

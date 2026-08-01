@@ -6,8 +6,39 @@ build-backend = "setuptools.build_meta"
 name = "legacy-bbs-toolkit"
 version = "0.1.0"
 description = "日本語BBS過去ログのアーカイブ前処理基盤（実装） / Preprocessing foundation for legacy Japanese BBS archives (1999-2002 era)"
+readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
+authors = [
+    { name = "MOTOI Kenkichi" }
+]
+keywords = [
+    "bbs",
+    "archive",
+    "japanese",
+    "preprocessing",
+    "digital-preservation",
+    "html-parser",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Sociology :: History",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "Natural Language :: Japanese",
+]
+
+[project.urls]
+Homepage = "https://github.com/gikonekos/legacy-bbs-toolkit"
+Repository = "https://github.com/gikonekos/legacy-bbs-toolkit"
+Changelog = "https://github.com/gikonekos/legacy-bbs-toolkit/blob/main/CHANGELOG.md"
 
 [project.scripts]
 legacy-bbs-toolkit = "legacy_bbs_toolkit.cli:main"
