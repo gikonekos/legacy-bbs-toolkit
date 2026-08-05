@@ -3,6 +3,23 @@
 1999〜2002年頃の日本語BBS過去ログ（あやしいわーるど等）を対象とした、
 デジタル文化資産の前処理基盤。
 
+
+## クイックスタート
+
+| 目的 | 行き先 |
+|------|--------|
+| **使い始める** | [QUICKSTART.md](QUICKSTART.md) |
+| **設計原則** | [spec/principles.md](spec/principles.md) |
+| **Parser API** | [spec/parser-api.md](spec/parser-api.md) |
+
+**関連ツール**
+
+- [ng-check-php](https://github.com/gikonekos/ng-check-php) — NGワード判定
+- [-to-utf8-php](https://github.com/gikonekos/-to-utf8-php) — 文字コード変換
+- [kuzuhascript-utf8](https://github.com/gikonekos/kuzuhascript-utf8) / [ksphp-plus-gikonekos](https://github.com/gikonekos/ksphp-plus-gikonekos) — 解析対象系の派生・移植
+- プロフィール: [github.com/gikonekos](https://github.com/gikonekos)
+
+---
 ## 製作方針
 
 速く、軽く、確実に。
